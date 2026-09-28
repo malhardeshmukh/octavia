@@ -1,0 +1,243 @@
+{% comment %}
+  Featured Products Section
+  Displays a grid of product cards.
+{% endcomment %}
+
+<section class="shopify-section section-padding bg-canvas-light" data-section-id="{{ section.id }}">
+  <div class="products-container">
+    <div class="section-header">
+      <h2 class="display-lg">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.button_label != blank -%}
+        <a href="{{ section.settings.button_link }}" class="button-outline-on-light">{{ section.settings.button_label }}</a>
+      {%- endif -%}
+    </div>
+    
+    <div class="products-grid">
+      {%- for product in section.settings.collection.products limit: section.settings.products_to_show -%}
+        <div class="product-card">
+          <a href="{{ product.url }}" class="product-card-link">
+            <div class="product-card-media">
+              {%- if product.featured_media -%}
+                <img 
+                  src="{{ product.featured_media | image_url: width: 600 }}" 
+                  width="{{ product.featured_media.width }}"
+                  height="{{ product.featured_media.height }}"
+                  alt="{{ product.featured_media.alt | escape }}" 
+                  loading="lazy"
+                >
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+              
+              {%- comment -%} Badges {%- endcomment -%}
+              <div class="badges">
+                {%- if product.available == false -%}
+                  <span class="badge-stock-out caption-uppercase">Sold Out</span>
+                {%- elsif product.compare_at_price > product.price -%}
+                  <span class="badge-sale caption-uppercase">Sale</span>
+                {%- endif -%}
+              </div>
+            </div>
+            
+            <div class="product-card-info">
+              <p class="caption-uppercase eyebrow">{{ product.type | default: 'Machine' }}</p>
+              <h3 class="title-sm product-title">{{ product.title | truncate: 50 }}</h3>
+              
+              <div class="price-block">
+                {%- if product.price_varies -%}
+                  <span class="price-md">From {{ product.price_min | money }}</span>
+                {%- else -%}
+                  <span class="price-md">{{ product.price | money }}</span>
+                {%- endif -%}
+                {%- if product.compare_at_price > product.price -%}
+                  <span class="price-compare">{{ product.compare_at_price | money }}</span>
+                {%- endif -%}
+              </div>
+            </div>
+          </a>
+          
+          <div class="quick-add">
+            {%- form 'product', product -%}
+              <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+              <button type="submit" class="button-primary full-width" {% unless product.available %}disabled{% endunless %}>
+                {%- if product.available -%}
+                  Quick Add
+                {%- else -%}
+                  Out of Stock
+                {%- endif -%}
+              </button>
+            {%- endform -%}
+          </div>
+        </div>
+      {%- else -%}
+        {%- for i in (1..section.settings.products_to_show) -%}
+          <div class="product-card">
+            <div class="product-card-media">
+              {{ 'product-' | append: i | placeholder_svg_tag: 'placeholder-svg' }}
+            </div>
+            <div class="product-card-info">
+              <p class="caption-uppercase eyebrow">Placeholder</p>
+              <h3 class="title-sm product-title">Example Product Title {{ i }}</h3>
+              <div class="price-block">
+                <span class="price-md">₹15,000.00</span>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .products-container {
+    padding: 0 var(--page-margin);
+    max-width: var(--page-width);
+    margin: 0 auto;
+  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: var(--spacing-lg);
+  }
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+  }
+  @media (min-width: 1024px) {
+    .products-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .product-card {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-canvas-light);
+    position: relative;
+    transition: transform var(--duration-fast) var(--easing-standard), box-shadow var(--duration-fast) var(--easing-standard);
+  }
+  .product-card:hover {
+    box-shadow: var(--shadow-small);
+  }
+  .product-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  
+  .product-card-media {
+    position: relative;
+    background-color: var(--color-surface-product);
+    aspect-ratio: 4 / 5;
+    padding: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .product-card-media img, .product-card-media svg {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  
+  .badges {
+    position: absolute;
+    top: var(--spacing-xs);
+    left: var(--spacing-xs);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xxxs);
+  }
+
+  .product-card-info {
+    padding: var(--spacing-xs) 0;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  
+  .eyebrow {
+    color: var(--color-body-muted-on-light);
+    margin-bottom: var(--spacing-xxxs);
+  }
+  
+  .product-title {
+    margin-bottom: var(--spacing-xxs);
+    color: var(--color-body-on-light);
+  }
+  
+  .price-block {
+    display: flex;
+    gap: var(--spacing-xxxs);
+    align-items: center;
+    margin-top: auto;
+  }
+  
+  .quick-add {
+    margin-top: var(--spacing-xs);
+    opacity: 1;
+  }
+  @media (min-width: 1024px) {
+    .quick-add {
+      opacity: 0;
+      transition: opacity var(--duration-fast) var(--easing-standard);
+      position: absolute;
+      bottom: var(--spacing-xs);
+      left: var(--spacing-xs);
+      right: var(--spacing-xs);
+    }
+    .product-card:hover .quick-add {
+      opacity: 1;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Featured Products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "New Arrivals"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 12,
+      "step": 2,
+      "default": 4,
+      "label": "Products to show"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "View All"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Products"
+    }
+  ]
+}
+{% endschema %}

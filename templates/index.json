@@ -1,20 +1,76 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
-    "main": {
-      "type": "hello-world",
+    "hero": {
+      "type": "hero-carousel",
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "title": "Express your dreamed design",
+            "text": "Asia's largest sewing machine manufacturer; Japanese-technology machines.",
+            "button_label": "Shop Machines",
+            "button_link": "shopify:\/\/collections\/all"
+          }
+        },
+        "slide-2": {
+          "type": "slide",
+          "settings": {
+            "title": "Performance Meets Sustainability",
+            "text": "Built for rigorous daily operations in trade and home setups.",
+            "button_label": "Discover",
+            "button_link": "shopify:\/\/collections\/all"
+          }
+        }
+      },
+      "block_order": [
+        "slide-1",
+        "slide-2"
+      ],
       "settings": {}
+    },
+    "collections": {
+      "type": "featured-collections",
+      "blocks": {
+        "col-1": {
+          "type": "collection",
+          "settings": {}
+        },
+        "col-2": {
+          "type": "collection",
+          "settings": {}
+        },
+        "col-3": {
+          "type": "collection",
+          "settings": {}
+        },
+        "col-4": {
+          "type": "collection",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "col-1",
+        "col-2",
+        "col-3",
+        "col-4"
+      ],
+      "settings": {
+        "heading": "Shop by Machine Type"
+      }
+    },
+    "products": {
+      "type": "featured-products",
+      "settings": {
+        "heading": "New Arrivals",
+        "products_to_show": 4,
+        "button_label": "View All",
+        "button_link": "shopify:\/\/collections\/all"
+      }
     }
   },
   "order": [
-    "main"
+    "hero",
+    "collections",
+    "products"
   ]
 }

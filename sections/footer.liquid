@@ -1,55 +1,366 @@
-<footer>
-  <div class="footer__copyright">
-    &copy;
-    {{ 'now' | date: '%Y' }}
-    {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
-  </div>
+{% comment %}
+  Footer Section
+  Detailed and comprehensive footer based on the "footer-dark" specification.
+{% endcomment %}
 
-  <div class="footer__links">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
+<footer class="footer-dark" data-section-id="{{ section.id }}" data-section-type="footer">
+  <div class="footer-container">
+    <div class="footer-grid">
+      
+      {%- comment -%} Column 1: Brand & Contact {%- endcomment -%}
+      <div class="footer-col brand-col">
+        <h2 class="display-md text-ink">{{ shop.name }}</h2>
+        <address class="body-sm text-body">
+          {{ section.settings.address | default: 'Raj Laxmi Complex, Gheekanta Rd<br>Ahmedabad, Gujarat 380001, India' }}
+        </address>
+        <div class="contact-links body-sm">
+          {%- if section.settings.phone != blank -%}
+            <a href="tel:{{ section.settings.phone }}" class="footer-link">{{ section.settings.phone }}</a>
+          {%- endif -%}
+          {%- if section.settings.email != blank -%}
+            <a href="mailto:{{ section.settings.email }}" class="footer-link">{{ section.settings.email }}</a>
+          {%- endif -%}
+          {%- if section.settings.whatsapp != blank -%}
+            <a href="{{ section.settings.whatsapp }}" class="footer-link" target="_blank">WhatsApp Us</a>
+          {%- endif -%}
+        </div>
+      </div>
 
-  <div class="footer__payment">
-    {% if section.settings.show_payment_icons %}
-      {% for type in shop.enabled_payment_types %}
-        {{ type | payment_type_svg_tag }}
-      {% endfor %}
-    {% endif %}
+      {%- comment -%} Column 2: Shop Menu {%- endcomment -%}
+      <div class="footer-col menu-col">
+        <h3 class="title-sm text-ink">Shop</h3>
+        <ul class="footer-menu list-unstyled body-sm">
+          {%- for link in linklists[section.settings.shop_menu].links -%}
+            <li><a href="{{ link.url }}" class="footer-link">{{ link.title }}</a></li>
+          {%- else -%}
+            <li><a href="#" class="footer-link">Machines</a></li>
+            <li><a href="#" class="footer-link">Spare Parts & Accessories</a></li>
+            <li><a href="#" class="footer-link">New Arrivals</a></li>
+            <li><a href="#" class="footer-link">Best Sellers</a></li>
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      {%- comment -%} Column 3: Support Menu {%- endcomment -%}
+      <div class="footer-col menu-col">
+        <h3 class="title-sm text-ink">Support</h3>
+        <ul class="footer-menu list-unstyled body-sm">
+          {%- for link in linklists[section.settings.support_menu].links -%}
+            <li><a href="{{ link.url }}" class="footer-link">{{ link.title }}</a></li>
+          {%- else -%}
+            <li><a href="#" class="footer-link">Warranty Registration</a></li>
+            <li><a href="#" class="footer-link">Book Service</a></li>
+            <li><a href="#" class="footer-link">Manuals & Downloads</a></li>
+            <li><a href="#" class="footer-link">Track Order</a></li>
+            <li><a href="#" class="footer-link">FAQs</a></li>
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      {%- comment -%} Column 4: Company Menu {%- endcomment -%}
+      <div class="footer-col menu-col">
+        <h3 class="title-sm text-ink">Company</h3>
+        <ul class="footer-menu list-unstyled body-sm">
+          {%- for link in linklists[section.settings.company_menu].links -%}
+            <li><a href="{{ link.url }}" class="footer-link">{{ link.title }}</a></li>
+          {%- else -%}
+            <li><a href="#" class="footer-link">Brand Legacy</a></li>
+            <li><a href="#" class="footer-link">Sustainability</a></li>
+            <li><a href="#" class="footer-link">Certifications</a></li>
+            <li><a href="#" class="footer-link">Dealers & Stockists</a></li>
+            <li><a href="#" class="footer-link">Request a Quote</a></li>
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      {%- comment -%} Column 5: Newsletter & Social {%- endcomment -%}
+      <div class="footer-col newsletter-col">
+        <div class="newsletter-band">
+          <h3 class="title-sm text-ink">Stay Updated</h3>
+          <p class="body-sm text-body">Get industry news and exclusive offers.</p>
+          {%- form 'customer', id: 'FooterNewsletter' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <div class="newsletter-form-group">
+              <label class="visually-hidden" for="NewsletterEmail">Email address</label>
+              <input 
+                id="NewsletterEmail"
+                type="email" 
+                name="contact[email]" 
+                class="text-input-on-dark full-width" 
+                placeholder="Email address" 
+                required
+              >
+              <button type="submit" class="button-outline-on-dark full-width">Subscribe</button>
+            </div>
+            <div class="newsletter-consent">
+              <input type="checkbox" id="NewsletterConsent" required>
+              <label for="NewsletterConsent" class="caption text-body">I agree to the privacy policy.</label>
+            </div>
+          {%- endform -%}
+        </div>
+        
+        <div class="social-links">
+          {%- if section.settings.instagram != blank -%}
+            <a href="{{ section.settings.instagram }}" class="footer-link body-sm" target="_blank">Instagram</a>
+          {%- endif -%}
+          {%- if section.settings.amazon != blank -%}
+            <a href="{{ section.settings.amazon }}" class="footer-link body-sm" target="_blank">Amazon</a>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+
+    {%- comment -%} Footer Bottom (Copyright, Policies, Payment, Legal) {%- endcomment -%}
+    <div class="footer-bottom">
+      <div class="footer-legal text-body caption">
+        <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</p>
+        {%- if section.settings.gstin != blank -%}
+          <p>GSTIN: {{ section.settings.gstin }}</p>
+        {%- endif -%}
+        {%- if section.settings.cin != blank -%}
+          <p>CIN: {{ section.settings.cin }}</p>
+        {%- endif -%}
+      </div>
+      
+      <div class="footer-policies">
+        <ul class="list-unstyled caption">
+          {%- for policy in shop.policies -%}
+            {%- if policy != blank -%}
+              <li><a href="{{ policy.url }}" class="footer-link">{{ policy.title }}</a></li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      {%- if section.settings.show_payment_icons -%}
+        <div class="footer-payment">
+          <span class="visually-hidden">Payment methods</span>
+          <ul class="list-unstyled payment-icons">
+            {%- for type in shop.enabled_payment_types -%}
+              <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    </div>
   </div>
 </footer>
 
-{% stylesheet %}
-  footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
+<style>
+  .footer-dark {
+    background-color: var(--color-canvas);
+    color: var(--color-body);
+    padding: var(--spacing-xl) 0;
   }
-  footer a {
+  @media (min-width: 1024px) {
+    .footer-dark {
+      padding: 64px 48px;
+    }
+  }
+
+  .footer-container {
+    padding: 0 var(--page-margin);
+    max-width: var(--page-width);
+    margin: 0 auto;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+  }
+  @media (min-width: 768px) {
+    .footer-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .footer-grid {
+      grid-template-columns: 2fr 1fr 1fr 1fr 2fr;
+      gap: var(--spacing-md);
+    }
+  }
+
+  .text-ink { color: var(--color-ink); }
+  .text-body { color: var(--color-body); }
+
+  .footer-col h2, .footer-col h3 {
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .contact-links {
+    margin-top: var(--spacing-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xxs);
+  }
+
+  .list-unstyled {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .footer-menu {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xxs);
+  }
+
+  .footer-link {
     text-decoration: none;
-    color: var(--color-foreground);
+    color: var(--color-body);
+    transition: color var(--duration-fast) var(--easing-standard);
   }
-  footer .footer__links,
-  footer .footer__payment {
+  .footer-link:hover {
+    color: var(--color-ink);
+  }
+
+  /* Newsletter */
+  .newsletter-band {
+    background-color: var(--color-canvas-elevated);
+    border-radius: var(--rounded-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+  }
+  .newsletter-form-group {
     display: flex;
-    gap: 1rem;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
   }
-{% endstylesheet %}
+  .text-input-on-dark {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--rounded-sm);
+    padding: 14px 16px;
+    height: 48px;
+    font-size: 14px;
+  }
+  .text-input-on-dark:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+  .newsletter-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-xxs);
+    margin-top: var(--spacing-xs);
+  }
+  
+  .social-links {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding: 0 var(--spacing-md);
+  }
+
+  /* Footer Bottom */
+  .footer-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-hairline);
+  }
+  @media (min-width: 1024px) {
+    .footer-bottom {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  .footer-legal p {
+    margin: 0;
+  }
+
+  .footer-policies ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .payment-icons {
+    display: flex;
+    gap: var(--spacing-xxxs);
+  }
+  .payment-icon {
+    height: 24px;
+    width: auto;
+  }
+  
+  .full-width {
+    width: 100%;
+  }
+</style>
 
 {% schema %}
 {
-  "name": "t:general.footer",
+  "name": "Footer",
   "settings": [
     {
+      "type": "text",
+      "id": "phone",
+      "label": "Phone Number",
+      "default": "+91 9876543210"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Email",
+      "default": "sales@jeemex.in"
+    },
+    {
+      "type": "url",
+      "id": "whatsapp",
+      "label": "WhatsApp Link"
+    },
+    {
+      "type": "textarea",
+      "id": "address",
+      "label": "Address"
+    },
+    {
       "type": "link_list",
-      "id": "menu",
-      "label": "t:labels.menu"
+      "id": "shop_menu",
+      "label": "Shop Menu"
+    },
+    {
+      "type": "link_list",
+      "id": "support_menu",
+      "label": "Support Menu"
+    },
+    {
+      "type": "link_list",
+      "id": "company_menu",
+      "label": "Company Menu"
+    },
+    {
+      "type": "url",
+      "id": "instagram",
+      "label": "Instagram Link"
+    },
+    {
+      "type": "url",
+      "id": "amazon",
+      "label": "Amazon Link"
+    },
+    {
+      "type": "text",
+      "id": "gstin",
+      "label": "GSTIN"
+    },
+    {
+      "type": "text",
+      "id": "cin",
+      "label": "CIN"
     },
     {
       "type": "checkbox",
       "id": "show_payment_icons",
-      "label": "t:labels.show_payment_icons",
+      "label": "Show payment icons",
       "default": true
     }
   ]
