@@ -1,49 +1,298 @@
 {% comment %}
-  This section is used in the product template to render product page with
-  media, content, and add-to-cart form.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/product
+  Product Detail Page (PDP) Section
+  Implements the 7/5 split, media plate, custom variant picker, and spec table.
 {% endcomment %}
 
-<div class="product-images">
-  {% for image in product.images %}
-    {% render 'image', class: 'product-image', image: image %}
-  {% endfor %}
-</div>
+<section class="shopify-section section-padding bg-canvas-light" data-section-id="{{ section.id }}" data-section-type="product">
+  <div class="product-layout">
+    
+    {%- comment -%} Gallery / Media (7 columns) {%- endcomment -%}
+    <div class="product-media-gallery">
+      <div class="media-plate">
+        {%- if product.selected_or_first_available_variant.image -%}
+          {%- assign featured_image = product.selected_or_first_available_variant.image -%}
+        {%- else -%}
+          {%- assign featured_image = product.featured_image -%}
+        {%- endif -%}
+        
+        {%- if featured_image -%}
+          <img 
+            src="{{ featured_image | image_url: width: 1200 }}" 
+            width="{{ featured_image.width }}"
+            height="{{ featured_image.height }}"
+            alt="{{ featured_image.alt | escape }}" 
+            class="main-product-image"
+            loading="eager"
+            fetchpriority="high"
+          >
+        {%- else -%}
+          {{ 'image' | placeholder_svg_tag: 'main-product-image placeholder-svg' }}
+        {%- endif -%}
+      </div>
+      
+      {%- if product.images.size > 1 -%}
+        <div class="media-thumbnails">
+          {%- for image in product.images -%}
+            <button class="thumbnail-button {% if image == featured_image %}is-active{% endif %}">
+              <img src="{{ image | image_url: width: 150 }}" width="150" height="{{ 150 | divided_by: image.aspect_ratio | round }}" alt="{{ image.alt | escape }}" loading="lazy">
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
 
-<div class="product-info">
-  <h1>{{ product.title }}</h1>
-  <p>{{ product.price | money }}</p>
-  <p>{{ product.description }}</p>
-</div>
+    {%- comment -%} Buy Box / Info (5 columns) {%- endcomment -%}
+    <div class="product-buy-box">
+      <div class="product-header">
+        <p class="caption-uppercase product-eyebrow">{{ product.type | default: 'Machine' }}</p>
+        <h1 class="display-md product-title">{{ product.title }}</h1>
+        <p class="body-sm product-key-spec">{{ product.metafields.custom.key_spec.value | default: 'Industrial Standard' }}</p>
+      </div>
 
-<div class="product-form">
-  {% form 'product', product %}
-    {% assign current_variant = product.selected_or_first_available_variant %}
+      <div class="product-price-block">
+        <span class="price-lg">{{ product.selected_or_first_available_variant.price | money }}</span>
+        {%- if product.selected_or_first_available_variant.compare_at_price > product.selected_or_first_available_variant.price -%}
+          <span class="price-compare">{{ product.selected_or_first_available_variant.compare_at_price | money }}</span>
+          <span class="badge-sale caption-uppercase">Sale</span>
+        {%- endif -%}
+        <p class="caption">Inclusive of all taxes (GST)</p>
+      </div>
 
-    <select name="id">
-      {% for variant in product.variants %}
-        <option
-          value="{{ variant.id }}"
-          {% if variant == current_variant %}
-            selected="selected"
-          {% endif %}
-        >
-          {{ variant.title }} - {{ variant.price | money }}
-        </option>
-      {% endfor %}
-    </select>
+      {%- form 'product', product, id: 'product-form-main', class: 'product-form' -%}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        
+        {% render 'variant-picker', product: product, current_variant: product.selected_or_first_available_variant %}
 
-    <input type="text" name="quantity" min="1" value="1">
+        <div class="product-actions">
+          <div class="quantity-wrapper">
+            <label for="Quantity-{{ section.id }}" class="visually-hidden">Quantity</label>
+            <div class="quantity-stepper">
+              <button type="button" class="stepper-btn minus" aria-label="Decrease quantity">−</button>
+              <input type="number" id="Quantity-{{ section.id }}" name="quantity" value="1" min="1" class="stepper-input">
+              <button type="button" class="stepper-btn plus" aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+          
+          <button type="submit" name="add" class="button-primary add-to-cart-btn"
+            {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
+          >
+            {%- if product.selected_or_first_available_variant.available -%}
+              Add to Cart
+            {%- else -%}
+              Out of Stock
+            {%- endif -%}
+          </button>
+        </div>
+        
+        <div class="secondary-actions">
+          <button type="button" class="button-dark full-width">Request Bulk Quote</button>
+        </div>
+      {%- endform -%}
 
-    <input type="submit" value="Add to cart">
-    {{ form | payment_button }}
-  {% endform %}
-</div>
+      {% render 'trust-strip' %}
+
+      {%- if product.description != blank -%}
+        <div class="product-description body-md">
+          {{ product.description }}
+        </div>
+      {%- endif -%}
+      
+      {% render 'spec-table', product: product %}
+      
+    </div>
+  </div>
+
+  {%- comment -%} Mobile Sticky Buy Bar {%- endcomment -%}
+  <div class="sticky-buy-bar">
+    <div class="sticky-buy-info">
+      <p class="title-sm">{{ product.title | truncate: 30 }}</p>
+      <p class="price-md">{{ product.selected_or_first_available_variant.price | money }}</p>
+    </div>
+    <button type="submit" form="product-form-main" class="button-primary sticky-add-btn">Add to Cart</button>
+  </div>
+</section>
+
+<style>
+  .product-layout {
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  @media (min-width: 1024px) {
+    .product-layout {
+      grid-template-columns: 7fr 5fr;
+      gap: var(--spacing-xl);
+    }
+  }
+
+  .media-plate {
+    background-color: var(--color-surface-product);
+    border-radius: var(--rounded-none);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .main-product-image {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    aspect-ratio: 4/5;
+  }
+
+  .media-thumbnails {
+    display: flex;
+    gap: var(--spacing-xs);
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+  }
+  .media-thumbnails::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
+  .thumbnail-button {
+    flex: 0 0 80px;
+    height: 80px;
+    background-color: var(--color-surface-product);
+    border: 1px solid transparent;
+    padding: 0;
+  }
+  .thumbnail-button.is-active {
+    border-color: var(--color-body-on-light);
+  }
+  .thumbnail-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .product-header {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .product-eyebrow {
+    color: var(--color-body-muted-on-light);
+    margin-bottom: var(--spacing-xxs);
+  }
+  
+  .product-title {
+    margin-bottom: var(--spacing-xxs);
+  }
+  
+  .product-key-spec {
+    color: var(--color-body-muted-on-light);
+  }
+
+  .product-price-block {
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+  }
+  
+  .badge-sale {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    padding: 4px 12px;
+    border-radius: var(--rounded-full);
+  }
+
+  .product-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .add-to-cart-btn {
+    flex: 1;
+  }
+
+  .secondary-actions {
+    margin-bottom: var(--spacing-md);
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .quantity-stepper {
+    display: flex;
+    height: 48px;
+    border: 1px solid var(--color-hairline-on-light);
+    background-color: var(--color-canvas-light);
+  }
+  
+  .stepper-btn {
+    width: 48px;
+    background: transparent;
+    color: var(--color-body-on-light);
+    font-size: 18px;
+  }
+  
+  .stepper-input {
+    width: 60px;
+    border: none;
+    border-left: 1px solid var(--color-hairline-on-light);
+    border-right: 1px solid var(--color-hairline-on-light);
+    text-align: center;
+    border-radius: 0;
+    padding: 0;
+    -moz-appearance: textfield;
+  }
+  .stepper-input::-webkit-outer-spin-button,
+  .stepper-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .product-description {
+    margin-top: var(--spacing-lg);
+    color: var(--color-body-muted-on-light);
+  }
+
+  /* Sticky Buy Bar */
+  .sticky-buy-bar {
+    display: none; /* hidden on desktop */
+  }
+  
+  @media (max-width: 1023px) {
+    .sticky-buy-bar {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background-color: var(--color-canvas-light);
+      border-top: 1px solid var(--color-hairline-on-light);
+      padding: var(--spacing-xs) var(--spacing-sm);
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    }
+    .sticky-buy-info p {
+      margin: 0;
+    }
+    .sticky-add-btn {
+      height: 40px;
+      padding: 0 24px;
+    }
+    /* Add padding to body to prevent footer overlap */
+    body {
+      padding-bottom: 72px;
+    }
+  }
+</style>
 
 {% schema %}
 {
-  "name": "t:general.product",
+  "name": "Product Layout",
   "settings": [],
   "disabled_on": {
     "groups": ["header", "footer"]

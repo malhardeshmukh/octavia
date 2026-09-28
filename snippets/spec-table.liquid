@@ -1,0 +1,78 @@
+{% doc %}
+  Renders a specification table for a product based on metafields.
+
+  @param {product} product - The product object
+{% enddoc %}
+
+{%- liquid
+  # Using dummy metafields for demonstration. In a real scenario, this would loop through specific namespace keys.
+  assign has_specs = false
+  if product.metafields.custom.specifications != blank
+    assign has_specs = true
+  endif
+-%}
+
+<div class="spec-table-container">
+  <h2 class="display-md">Specifications</h2>
+  
+  <div class="spec-table">
+    {%- if has_specs -%}
+      {%- for spec in product.metafields.custom.specifications.value -%}
+        <dl class="spec-table-row">
+          <dt class="spec-label body-md">{{ spec.label }}</dt>
+          <dd class="spec-value-text body-md">{{ spec.value }}</dd>
+        </dl>
+      {%- endfor -%}
+    {%- else -%}
+      {%- comment -%} Fallback placeholder data if no metafields exist {%- endcomment -%}
+      <dl class="spec-table-row">
+        <dt class="spec-label body-md">Machine Type</dt>
+        <dd class="spec-value-text body-md">{{ product.type | default: 'Industrial Sewing Machine' }}</dd>
+      </dl>
+      <dl class="spec-table-row">
+        <dt class="spec-label body-md">Model</dt>
+        <dd class="spec-value-text body-md">{{ product.variants.first.sku | default: 'N/A' }}</dd>
+      </dl>
+      <dl class="spec-table-row">
+        <dt class="spec-label body-md">Max Speed</dt>
+        <dd class="spec-value-text body-md">5500 SPM</dd>
+      </dl>
+      <dl class="spec-table-row">
+        <dt class="spec-label body-md">Needle System</dt>
+        <dd class="spec-value-text body-md">DBx1</dd>
+      </dl>
+    {%- endif -%}
+  </div>
+</div>
+
+<style>
+  .spec-table-container {
+    margin-top: var(--spacing-xl);
+  }
+  .spec-table-container h2 {
+    margin-bottom: var(--spacing-md);
+  }
+  .spec-table {
+    display: flex;
+    flex-direction: column;
+  }
+  .spec-table-row {
+    display: flex;
+    padding: var(--spacing-xs) 0;
+    border-bottom: 1px solid var(--color-hairline-on-light);
+    margin: 0;
+  }
+  .spec-table-row:last-child {
+    border-bottom: none;
+  }
+  .spec-label {
+    flex: 0 0 40%;
+    color: var(--color-body-muted-on-light);
+    margin: 0;
+  }
+  .spec-value-text {
+    flex: 0 0 60%;
+    color: var(--color-body-on-light);
+    margin: 0;
+  }
+</style>

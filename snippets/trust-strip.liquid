@@ -1,0 +1,43 @@
+{% doc %}
+  Renders a trust strip (Warranty, GST invoice, Secure payments, Easy returns).
+{% enddoc %}
+
+<div class="trust-strip">
+  <div class="trust-item">
+    <span class="trust-icon">✓</span>
+    <span class="trust-label body-sm">Warranty & Service</span>
+  </div>
+  <div class="trust-item">
+    <span class="trust-icon">₹</span>
+    <span class="trust-label body-sm">GST Invoice</span>
+  </div>
+  <div class="trust-item">
+    <span class="trust-icon">🔒</span>
+    <span class="trust-label body-sm">Secure Payments</span>
+  </div>
+  <div class="trust-item">
+    <span class="trust-icon">↩</span>
+    <span class="trust-label body-sm">Easy Returns</span>
+  </div>
+</div>
+
+<style>
+  .trust-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-sm) 0;
+    border-top: 1px solid var(--color-hairline-on-light);
+    border-bottom: 1px solid var(--color-hairline-on-light);
+  }
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xxs);
+    color: var(--color-body-muted-on-light);
+  }
+  .trust-icon {
+    font-size: 16px; /* In a real scenario, this would be an SVG from the icon set */
+  }
+</style>
